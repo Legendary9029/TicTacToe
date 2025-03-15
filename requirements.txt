@@ -1,0 +1,8 @@
+# Backend
+fastapi
+uvicorn
+pydantic
+
+# Frontend
+streamlit
+requests
