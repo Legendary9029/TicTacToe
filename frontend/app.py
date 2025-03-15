@@ -1,6 +1,7 @@
 import streamlit as st
-import random
-import time  # For AI delay
+import requests  # For API communication
+
+API_URL = "http://127.0.0.1:8000"  # Local FastAPI server
 
 # Initialize session state
 if "board" not in st.session_state:
@@ -11,50 +12,36 @@ if "board" not in st.session_state:
     st.session_state.mode = "AI"  # Default mode: AI
     st.session_state.moves = 0
     st.session_state.pending_ai_move = False  # Ensures AI move triggers after rerun
+    st.session_state.difficulty = "Medium"  # Default AI difficulty
 
-# Function to check for a win or draw
+# Check game state using API
 def check_game_state():
-    board = st.session_state.board
-    for row in board:
-        if row[0] == row[1] == row[2] and row[0] != "":
-            st.session_state.game_over = True
-            st.session_state.winner = row[0]
-            return
-    for col in range(3):
-        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != "":
-            st.session_state.game_over = True
-            st.session_state.winner = board[0][col]
-            return
-    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != "":
+    response = requests.post(f"{API_URL}/check-winner/", json={"board": st.session_state.board})
+    winner = response.json().get("winner")
+    if winner:
         st.session_state.game_over = True
-        st.session_state.winner = board[0][0]
-        return
-    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != "":
-        st.session_state.game_over = True
-        st.session_state.winner = board[0][2]
-        return
-    if st.session_state.moves == 9:
+        st.session_state.winner = winner
+    elif st.session_state.moves == 9:
         st.session_state.game_over = True
         st.session_state.winner = "Draw"
 
-# AI Move
+# AI Move using API
 def ai_play():
-    if (
-        st.session_state.current_player == "O"
-        and not st.session_state.game_over
-        and st.session_state.mode == "AI"
-    ):
-        empty_cells = [(i, j) for i in range(3) for j in range(3) if st.session_state.board[i][j] == ""]
-        if empty_cells:
-            time.sleep(0.3)  # Short delay for better UX
-            i, j = random.choice(empty_cells)
+    if st.session_state.current_player == "O" and not st.session_state.game_over and st.session_state.mode == "AI":
+        response = requests.post(
+            f"{API_URL}/ai-move/",
+            json={"board": st.session_state.board, "difficulty": st.session_state.difficulty.lower()}
+        )
+        move = response.json().get("move")
+        if move:
+            i, j = move
             st.session_state.board[i][j] = "O"
             st.session_state.moves += 1
             check_game_state()
             if not st.session_state.game_over:
                 st.session_state.current_player = "X"
             st.session_state.pending_ai_move = False  # AI move completed
-            st.rerun()  # Ensure UI updates immediately
+            st.rerun()
 
 # Reset Game
 def reset_game():
@@ -71,6 +58,11 @@ st.title("🎮 Tic-Tac-Toe AI 🤖")
 # Game Mode Selection
 mode = st.radio("Select Mode:", ["AI", "Player vs Player"], index=0)
 st.session_state.mode = "AI" if mode == "AI" else "PvP"
+
+# AI Difficulty Selection (Only if playing against AI)
+if st.session_state.mode == "AI":
+    difficulty = st.selectbox("Select AI Difficulty:", ["Easy", "Medium", "Hard"], index=1)
+    st.session_state.difficulty = difficulty
 
 st.markdown(f"### 🟢 Turn: **{st.session_state.current_player}**")
 
