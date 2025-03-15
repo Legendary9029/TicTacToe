@@ -6,7 +6,7 @@ A modern and responsive Tic-Tac-Toe game built with **Streamlit**. Play against 
 
 ## 🚀 Features
 
-✅ **AI Mode** - Play against an AI that makes random moves.  
+✅ **AI Mode** - Play against an AI that makes smart moves.  
 ✅ **Player vs Player (PvP) Mode** - Two players can play locally.  
 ✅ **Smart AI Turns** - AI plays automatically after the player's move.  
 ✅ **Instant UI Updates** - No need to press buttons twice!  
@@ -17,11 +17,22 @@ A modern and responsive Tic-Tac-Toe game built with **Streamlit**. Play against 
 
 ---
 
+## 📂 Project Structure
+```
+├── backend
+│   ├── main.py   # FastAPI backend
+│   ├── ai_logic.py # AI logic using Minimax
+├── frontend
+│   ├── app.py   # Streamlit frontend
+├── run.py      # Script to start both backend & frontend
+├── README.md   # Project documentation
+```
+
 ## 🛠️ Installation & Setup
 
 ### 1️⃣ **Clone the Repository**
 ```bash
-git clone https://github.com/your-username/tic-tac-toe-streamlit.git
+git clone https://github.com/Legendary9029/tic-tac-toe-streamlit.git
 cd tic-tac-toe-streamlit
 ```
 
@@ -39,8 +50,10 @@ pip install -r requirements.txt
 
 ### 4️⃣ **Run the Application**
 ```bash
-streamlit run frontend/app.py
+python run.py
 ```
+
+This will automatically start both the **backend (FastAPI)** and **frontend (Streamlit)**.
 
 ---
 
@@ -61,7 +74,8 @@ streamlit run frontend/app.py
 
 ## 🛠️ Tech Stack
 - **Frontend:** Streamlit (Python)
-- **AI Logic:** Python with Randomized AI Moves
+- **Backend:** FastAPI (Python)
+- **AI Logic:** Minimax Algorithm for Smart AI Moves
 - **State Management:** Streamlit Session State
 
 ---
